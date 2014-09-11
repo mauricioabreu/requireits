@@ -2,6 +2,7 @@ import json
 import logging
 import os.path
 from pkg_resources import parse_version
+import os
 import sys
 import tempfile
 
@@ -21,6 +22,10 @@ TEST_REQUIREMENTS_PKGS = """
 
 MORE_TEST_REQUIREMENTS_PKGS = """
         requests==2.2.1
+    """
+
+PIP_IGNORE_PKGS = """
+        Django
     """
 
 logger = logging.getLogger('check_requirements')
@@ -96,14 +101,14 @@ def get_latest_version(pkg_info):
 
 def get_ignored_packages():
     """Return a list of ignored packages described inside .pipignopre"""
-    ignored_packages = ()
+    ignored_packages = []
     if os.path.isfile('.pipignore'):
         with open('.pipignore') as f:
-            ignored_packages = f.read().splitlines()
+            ignored_packages = f.read().strip().splitlines()
     return ignored_packages
 
 
-def get_packages(req_files):
+def get_packages(req_files, ignored_packages=None):
     """Get packages to be reported
 
     Examples
@@ -123,14 +128,17 @@ def get_packages(req_files):
 
     """
     requirements_pkgs = parse_requirements(req_files)
-    # dict of Requirement objects
+
     reported_pkgs = []
 
     for pkg in requirements_pkgs:
         installed_version = None
         latest_version = None
 
-        if not pkg.name in get_ignored_packages():
+        if not ignored_packages:
+            ignored_packages = get_ignored_packages()
+
+        if not pkg.name in ignored_packages:
             pkg_versions = get_latest_version(get_pkg_info(pkg.name))
 
             if pkg:
@@ -168,3 +176,12 @@ def test_multiple_requirement_files():
             f2.flush()
             pkgs = get_packages([f1.name, f2.name])
     assert len(pkgs) == 4
+
+
+def test_ignored_pkgs():
+    with tempfile.NamedTemporaryFile('w+r') as f:
+        f.write(TEST_REQUIREMENTS_PKGS)
+        f.flush()
+        ignored_packages = ['Django']
+        pkgs = get_packages([f.name], ignored_packages)
+    assert len(pkgs) == 2
