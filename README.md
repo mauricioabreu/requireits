@@ -19,3 +19,4 @@ Planned features
 * Web interface
 * Report security fixes
 * Integration with Github (automatically create a pull request if it is a important package to update like pytz)
+* Report how many packages are py3k compatible
