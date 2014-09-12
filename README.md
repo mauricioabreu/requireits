@@ -10,7 +10,7 @@ requireits can be used to
 
 ## Testing
 
-py.test requireits.py
+py.test requireits_tests.py
 
 ## Roadmap
 
