@@ -4,7 +4,6 @@ import os.path
 from pkg_resources import parse_version
 import os
 import sys
-import tempfile
 
 import requests
 import requirements
@@ -13,20 +12,6 @@ import requirements
 PYPI_URL = 'https://pypi.python.org/pypi/{0}/json'
 
 FAIL_SILENTLY = False
-
-TEST_REQUIREMENTS_PKGS = """
-        Django==1.6.7
-        south==0.8.4
-        git+https://github.com/jeffkistler/django-decorator-include.git@1cce01ee0130156e8fde5c46e61287bea37c5c7f#egg=django-decorator-include
-    """
-
-MORE_TEST_REQUIREMENTS_PKGS = """
-        requests==2.2.1
-    """
-
-PIP_IGNORE_PKGS = """
-        Django
-    """
 
 logger = logging.getLogger('check_requirements')
 logger_handler = logging.StreamHandler(sys.stdout)
@@ -48,7 +33,7 @@ class Requirement(object):
         self.latest_version = latest_version
 
     def is_outdated(self):
-        return self.installed_version != self.latest_version:
+        return self.installed_version != self.latest_version
 
     def is_valid_package(self):
         return bool(self.installed_version)
@@ -103,24 +88,7 @@ def get_ignored_packages():
 
 
 def get_packages(req_files, ignored_packages=None):
-    """Get packages to be reported
-
-    Examples
-    --------
-
-    req_files = ['requirements/base.txt', ]
-    pkgs = get_packages(req_files)
-
-    for pkg in pkgs:
-        if pkg.is_valid_package():
-            if pkg.is_outdated:
-                print 'Package {0} is outdated.'.format(pkg.name)
-            else:
-                print 'Package {0} is up-to-date.'.format(pkg.name)
-        else:
-            print 'No information found for {0}.'.format(pkg.name)
-
-    """
+    """Get packages to be reported"""
     requirements_pkgs = parse_requirements(req_files)
 
     reported_pkgs = []
@@ -151,31 +119,3 @@ def get_packages(req_files, ignored_packages=None):
                 reported_pkgs.append(req)
 
     return reported_pkgs
-
-
-def test_check_count_pkgs():
-    with tempfile.NamedTemporaryFile('w') as f:
-        f.write(TEST_REQUIREMENTS_PKGS)
-        f.flush()
-        pkgs = get_packages([f.name])
-    assert len(pkgs) == 3
-
-
-def test_multiple_requirement_files():
-    with tempfile.NamedTemporaryFile('w') as f1:
-        f1.write(TEST_REQUIREMENTS_PKGS)
-        f1.flush()
-        with tempfile.NamedTemporaryFile('w') as f2:
-            f2.write(MORE_TEST_REQUIREMENTS_PKGS)
-            f2.flush()
-            pkgs = get_packages([f1.name, f2.name])
-    assert len(pkgs) == 4
-
-
-def test_ignored_pkgs():
-    with tempfile.NamedTemporaryFile('w+r') as f:
-        f.write(TEST_REQUIREMENTS_PKGS)
-        f.flush()
-        ignored_packages = ['Django']
-        pkgs = get_packages([f.name], ignored_packages)
-    assert len(pkgs) == 2
