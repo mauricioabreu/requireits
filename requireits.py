@@ -48,16 +48,10 @@ class Requirement(object):
         self.latest_version = latest_version
 
     def is_outdated(self):
-        if self.installed_version != self.latest_version:
-            return True
-        else:
-            return False
+        return self.installed_version != self.latest_version:
 
     def is_valid_package(self):
-        if not self.installed_version:
-            return False
-        else:
-            return True
+        return bool(self.installed_version)
 
 
 def parse_requirements(req_files):
