@@ -54,3 +54,15 @@ def test_ignored_pkgs():
         ignored_packages = ['Django']
         pkgs = requireits.get_packages([f.name], ignored_packages)
     assert len(pkgs) == 2
+
+
+def test_outdated_pkg():
+    """Test if package is outdated."""
+    req = requireits.Requirement('Django', '1.6.7', '1.7.0')
+    assert req.is_outdated() == True
+
+
+def test_valid_package():
+    """Test if package is valid."""
+    req = requireits.Requirement('requireits', None, None)
+    assert req.is_valid_package() == False
