@@ -1,3 +1,5 @@
+"""requireits API."""
+
 import json
 import logging
 import os.path
@@ -22,25 +24,31 @@ logger.addHandler(logger_handler)
 
 
 class PackageNotFound(Exception):
-    pass
+
+    """Exception raised for packages no found."""
 
 
 class Requirement(object):
 
+    """Requirement object stores package health information."""
+
     def __init__(self, name, installed_version, latest_version):
+        """Set package information."""
         self.name = name
         self.installed_version = installed_version
         self.latest_version = latest_version
 
     def is_outdated(self):
+        """Return whether the package is outdated."""
         return self.installed_version != self.latest_version
 
     def is_valid_package(self):
+        """Return whether the package is valid."""
         return bool(self.installed_version)
 
 
 def parse_requirements(req_files):
-    """Parse a list of requirement file and return a set of packages"""
+    """Parse a list of requirement file and return a set of packages."""
     reqs = []
 
     for req_file in req_files:
@@ -52,7 +60,7 @@ def parse_requirements(req_files):
 
 
 def load_pkg_info(pkg_name):
-    "Load package info given a package name"
+    """Load package info given a package name."""
     try:
         url_req = requests.get(PYPI_URL.format(pkg_name))
     except requests.exceptions.ConnectionError:
@@ -64,6 +72,7 @@ def load_pkg_info(pkg_name):
 
 
 def get_pkg_info(pkg_name):
+    """Get package info. Setting FAIL_SILENTLY to true should stop running."""
     pkg_info = load_pkg_info(pkg_name)
     if not pkg_info and not FAIL_SILENTLY:
         raise PackageNotFound('{0} not found.'.format(pkg_name))
@@ -71,7 +80,7 @@ def get_pkg_info(pkg_name):
 
 
 def get_latest_version(pkg_info):
-    """Return latest version of a package"""
+    """Return latest version of a package."""
     if not pkg_info:
         return None, None
     version = pkg_info['info']['version']
@@ -79,7 +88,7 @@ def get_latest_version(pkg_info):
 
 
 def get_ignored_packages():
-    """Return a list of ignored packages described inside .pipignopre"""
+    """Return a list of ignored packages described inside .pipignopre."""
     ignored_packages = []
     if os.path.isfile('.pipignore'):
         with open('.pipignore') as f:
@@ -88,7 +97,7 @@ def get_ignored_packages():
 
 
 def get_packages(req_files, ignored_packages=None):
-    """Get packages to be reported"""
+    """Get packages to be reported."""
     requirements_pkgs = parse_requirements(req_files)
 
     reported_pkgs = []
@@ -100,7 +109,7 @@ def get_packages(req_files, ignored_packages=None):
         if not ignored_packages:
             ignored_packages = get_ignored_packages()
 
-        if not pkg.name in ignored_packages:
+        if pkg.name not in ignored_packages:
             pkg_versions = get_latest_version(get_pkg_info(pkg.name))
 
             if pkg:

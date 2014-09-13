@@ -1,3 +1,11 @@
+"""requireits tests.
+
+To run these tests you shoud have py.test installed.
+Use py.test requireits_tests.py
+
+All tests should pass.
+"""
+
 import tempfile
 
 import requireits
@@ -18,6 +26,7 @@ PIP_IGNORE_PKGS = """
 
 
 def test_check_count_pkgs():
+    """Test if total of checked packages are equal to reported packages."""
     with tempfile.NamedTemporaryFile('w') as f:
         f.write(TEST_REQUIREMENTS_PKGS)
         f.flush()
@@ -26,6 +35,7 @@ def test_check_count_pkgs():
 
 
 def test_multiple_requirement_files():
+    """Test requireits using multiple files."""
     with tempfile.NamedTemporaryFile('w') as f1:
         f1.write(TEST_REQUIREMENTS_PKGS)
         f1.flush()
@@ -37,6 +47,7 @@ def test_multiple_requirement_files():
 
 
 def test_ignored_pkgs():
+    """Test if ignored packages are being considered."""
     with tempfile.NamedTemporaryFile('w+r') as f:
         f.write(TEST_REQUIREMENTS_PKGS)
         f.flush()
