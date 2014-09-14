@@ -7,6 +7,7 @@ from pkg_resources import parse_version
 import os
 import sys
 
+import click
 import requests
 import requirements
 
@@ -42,7 +43,7 @@ class Requirement(object):
         """Return whether the package is outdated."""
         return self.installed_version != self.latest_version
 
-    def is_valid_package(self):
+    def is_valid(self):
         """Return whether the package is valid."""
         return bool(self.installed_version)
 
@@ -128,3 +129,29 @@ def get_packages(req_files, ignored_packages=None):
                 reported_pkgs.append(req)
 
     return reported_pkgs
+
+
+def generate_report(pkgs):
+    """Generate packages report."""
+    if not pkgs:
+        raise ValueError("Could not generate report without packages.")
+
+    for pkg in pkgs:
+        if pkg.is_valid():
+            if pkg.is_outdated():
+                logger.info("{} is outdated.".format(pkg.name))
+            else:
+                logger.info("{} is up-to-date.".format(pkg.name))
+        else:
+            logger.info("No information found for {}.".format(pkg.name))
+
+
+@click.command()
+@click.argument('files', nargs=-1, type=click.Path())
+def report(files):
+    """Output packages report."""
+    pkgs = get_packages(files)
+    generate_report(pkgs)
+
+if __name__ == '__main__':
+    report()

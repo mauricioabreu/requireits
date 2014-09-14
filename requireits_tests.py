@@ -62,7 +62,7 @@ def test_outdated_pkg():
     assert req.is_outdated() is True
 
 
-def test_valid_package():
+def test_valid_pkg():
     """Test if package is valid."""
     req = requireits.Requirement('requireits', None, None)
-    assert req.is_valid_package() is False
+    assert req.is_valid() is False
