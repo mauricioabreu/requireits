@@ -8,6 +8,8 @@ All tests should pass.
 
 import tempfile
 
+from click.testing import CliRunner
+
 import requireits
 
 TEST_REQUIREMENTS_PKGS = """
@@ -66,3 +68,13 @@ def test_valid_pkg():
     """Test if package is valid."""
     req = requireits.Requirement('requireits', None, None)
     assert req.is_valid() is False
+
+
+def test_cli():
+    """Test command line interface."""
+    runner = CliRunner()
+    with tempfile.NamedTemporaryFile('w') as f:
+        f.write(TEST_REQUIREMENTS_PKGS)
+        f.flush()
+        result = runner.invoke(requireits.report, [f.name])
+    assert result.exit_code == 0

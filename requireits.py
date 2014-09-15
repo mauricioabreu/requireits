@@ -147,7 +147,7 @@ def generate_report(pkgs):
 
 
 @click.command()
-@click.argument('files', nargs=-1, type=click.Path())
+@click.argument('files', nargs=-1, type=click.Path(exists=True))
 def report(files):
     """Output packages report."""
     pkgs = get_packages(files)
