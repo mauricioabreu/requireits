@@ -6,6 +6,7 @@ Use py.test requireits_tests.py
 All tests should pass.
 """
 
+import json
 import tempfile
 
 from click.testing import CliRunner
@@ -25,6 +26,18 @@ MORE_TEST_REQUIREMENTS_PKGS = """
 PIP_IGNORE_PKGS = """
         Django
     """
+
+REQUIREITS_JSON = """
+{
+    "Django": {
+        "ignore": true
+    },
+    "click": {
+        "ignore": false,
+        "changelog": "http://click.pocoo.org/3/changelog/"
+    }
+}
+"""
 
 
 def test_check_count_pkgs():
@@ -53,8 +66,8 @@ def test_ignored_pkgs():
     with tempfile.NamedTemporaryFile('w+r') as f:
         f.write(TEST_REQUIREMENTS_PKGS)
         f.flush()
-        ignored_packages = ['Django']
-        pkgs = requireits.get_packages([f.name], ignored_packages)
+        extra_info = json.loads(REQUIREITS_JSON)
+        pkgs = requireits.get_packages([f.name], extra_info)
     assert len(pkgs) == 2
 
 

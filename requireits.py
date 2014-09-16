@@ -60,7 +60,7 @@ def parse_requirements(req_files):
     return set(reqs)
 
 
-def load_pkg_info(pkg_name):
+def load_package_info(pkg_name):
     """Load package info given a package name."""
     try:
         url_req = requests.get(PYPI_URL.format(pkg_name))
@@ -72,9 +72,9 @@ def load_pkg_info(pkg_name):
         return json.loads(pkg_info.decode('utf-8'))
 
 
-def get_pkg_info(pkg_name):
+def get_package_info(pkg_name):
     """Get package info. Setting FAIL_SILENTLY to true should stop running."""
-    pkg_info = load_pkg_info(pkg_name)
+    pkg_info = load_package_info(pkg_name)
     if not pkg_info and not FAIL_SILENTLY:
         raise PackageNotFound('{0} not found.'.format(pkg_name))
     return pkg_info
@@ -88,38 +88,45 @@ def get_latest_version(pkg_info):
     return parse_version(version), version
 
 
-def get_ignored_packages():
-    """Return a list of ignored packages described inside .pipignopre."""
-    ignored_packages = []
-    if os.path.isfile('.pipignore'):
-        with open('.pipignore') as f:
-            ignored_packages = f.read().strip().splitlines()
-    return ignored_packages
+def get_extra_packages_info():
+    """Return a dict containing extra package info."""
+    extra_info = {}
+    if os.path.isfile('requireits.json'):
+        with open('requireits.json') as f:
+            extra_info = json.load(f)
+    return extra_info
 
 
-def get_packages(req_files, ignored_packages=None):
+def get_packages(req_files, extra_info=None):
     """Get packages to be reported."""
     requirements_pkgs = parse_requirements(req_files)
 
     reported_pkgs = []
 
+    # Collect extra info about packages
+    if not extra_info:
+        extra_info = get_extra_packages_info()
+
+    # Lowercase all dict keys
+    extra_info = dict((k.lower(), v) for k, v in extra_info.iteritems())
+
     for pkg in requirements_pkgs:
         installed_version = None
         latest_version = None
 
-        if not ignored_packages:
-            ignored_packages = get_ignored_packages()
+        pkg_versions = get_latest_version(get_package_info(pkg.name))
 
-        if pkg.name not in ignored_packages:
-            pkg_versions = get_latest_version(get_pkg_info(pkg.name))
-
-            if pkg:
+        if pkg:
+            # Check if package has any extra info
+            pkg_extra_info = extra_info.get(pkg.name.lower(), {})
+            # Check if package should be ignored
+            if not pkg_extra_info.get('ignore', False):
                 try:
                     installed_version = pkg.specs[0][1]
                     latest_version = pkg_versions[1]
                 except IndexError:
-                    logger.debug(
-                        'No information found for {0}.'.format(pkg.name))
+                    logger.debug('No information found for {0}.'.
+                                 format(pkg.name))
                 finally:
                     req = Requirement(pkg.name,
                                       installed_version,
