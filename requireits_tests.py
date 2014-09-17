@@ -10,8 +10,12 @@ import json
 import tempfile
 
 from click.testing import CliRunner
+from mock import patch
+import pytest
+import requests
 
 import requireits
+
 
 TEST_REQUIREMENTS_PKGS = """
         Django==1.6.7
@@ -81,6 +85,34 @@ def test_valid_pkg():
     """Test if package is valid."""
     req = requireits.Requirement('requireits', None, None)
     assert req.is_valid() is False
+
+
+def test_pypi_connection_error():
+    """Test pypi connection error."""
+    with patch.object(requests, 'get') as mock_method:
+        mock_method.side_effect = requests.exceptions.ConnectionError
+        assert requireits.load_package_info('requests') is None
+
+
+def test_unknown_latest_version():
+    """Test for unknown latest version.
+
+    Some packace versions can not be found.
+    """
+    pkg_latest_version = requireits.get_latest_version(None)
+    assert pkg_latest_version == (None, None)
+
+
+def test_pkg_not_found():
+    """Test for packages not found.
+
+    If FAIL_SILENTLY is set to True, get_package_info should just return None.
+    In case of FAIL_SILENTLY is set to False then the program should stop
+    raising PackageNotFound exception.
+    """
+    requireits.FAIL_SILENTLY = False
+    with pytest.raises(requireits.PackageNotFound):
+        requireits.get_package_info('this.package.should.not.exist')
 
 
 def test_cli():

@@ -14,7 +14,7 @@ import requirements
 
 PYPI_URL = 'https://pypi.python.org/pypi/{0}/json'
 
-FAIL_SILENTLY = False
+FAIL_SILENTLY = True
 
 logger = logging.getLogger('check_requirements')
 logger_handler = logging.StreamHandler(sys.stdout)
@@ -161,4 +161,4 @@ def report(files):
     generate_report(pkgs)
 
 if __name__ == '__main__':
-    report()
+    report()  # pragma: no cover
