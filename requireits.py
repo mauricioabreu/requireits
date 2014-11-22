@@ -148,7 +148,6 @@ def is_py3k_compatible(package):
         return "{} not compatible with Python 3.".format(package)
 
 
-
 def generate_report(pkgs, py3k=False):
     """Generate packages report."""
     if not pkgs:
@@ -168,8 +167,8 @@ def generate_report(pkgs, py3k=False):
 
 @click.command()
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
-@click.option('--py3k', is_flag=True, help='Check if packages are py3k compatible.')
-def report(files, py3k):
+@click.option('--py3k', is_flag=True, help='Check py3k compatible packages.')
+def report(files, py3k=False):
     """Output packages report."""
     pkgs = get_packages(files)
     generate_report(pkgs, py3k)

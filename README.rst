@@ -30,3 +30,4 @@ Roadmap
 
 - web interface
 - report security fixes
+- badges
