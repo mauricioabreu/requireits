@@ -7,6 +7,7 @@ from pkg_resources import parse_version
 import os
 import sys
 
+import caniusepython3
 import click
 import requests
 import requirements
@@ -138,7 +139,17 @@ def get_packages(req_files, extra_info=None):
     return reported_pkgs
 
 
-def generate_report(pkgs):
+def is_py3k_compatible(package):
+    """Wrapper around caniusepython3 check function."""
+    compatible = caniusepython3.check(projects=[package])
+    if compatible:
+        return "{} compatible with Python 3.".format(package)
+    else:
+        return "{} not compatible with Python 3.".format(package)
+
+
+
+def generate_report(pkgs, py3k=False):
     """Generate packages report."""
     if not pkgs:
         raise ValueError("Could not generate report without packages.")
@@ -149,16 +160,19 @@ def generate_report(pkgs):
                 logger.info("{} is outdated.".format(pkg.name))
             else:
                 logger.info("{} is up-to-date.".format(pkg.name))
+            if py3k:
+                logger.info(is_py3k_compatible(pkg.name))
         else:
             logger.info("No information found for {}.".format(pkg.name))
 
 
 @click.command()
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
-def report(files):
+@click.option('--py3k', is_flag=True, help='Check if packages are py3k compatible.')
+def report(files, py3k):
     """Output packages report."""
     pkgs = get_packages(files)
-    generate_report(pkgs)
+    generate_report(pkgs, py3k)
 
 if __name__ == '__main__':
     report()  # pragma: no cover
