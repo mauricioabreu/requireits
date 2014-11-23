@@ -2,14 +2,17 @@
 
 import json
 import logging
-import os.path
-from pkg_resources import parse_version
 import os
 import sys
 
 import caniusepython3
+
 import click
+
+from pkg_resources import parse_version
+
 import requests
+
 import requirements
 
 

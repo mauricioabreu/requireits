@@ -10,8 +10,11 @@ import json
 import tempfile
 
 from click.testing import CliRunner
+
 from mock import patch
+
 import pytest
+
 import requests
 
 import requireits
