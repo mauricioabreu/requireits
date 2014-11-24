@@ -4,6 +4,7 @@ requireits
 .. image:: https://travis-ci.org/mauricioabreu/requireits.svg?branch=master
     :target: https://github.com/mauricioabreu/requireits
 
+
 Check your Python requirements the easy way.
 
 **requireits** can be used to:

@@ -51,6 +51,10 @@ class Requirement(object):
         """Return whether the package is valid."""
         return bool(self.installed_version)
 
+    def is_py3k_compatible(self):
+        """Return whether the package is py3k compatible."""
+        return caniusepython3.check(projects=[self.name])
+
 
 def parse_requirements(req_files):
     """Parse a list of requirement file and return a set of packages."""
@@ -80,7 +84,7 @@ def get_package_info(pkg_name):
     """Get package info. Setting FAIL_SILENTLY to true should stop running."""
     pkg_info = load_package_info(pkg_name)
     if not pkg_info and not FAIL_SILENTLY:
-        raise PackageNotFound('{0} not found.'.format(pkg_name))
+        raise PackageNotFound('{} not found.'.format(pkg_name))
     return pkg_info
 
 
@@ -129,7 +133,7 @@ def get_packages(req_files, extra_info=None):
                     installed_version = pkg.specs[0][1]
                     latest_version = pkg_versions[1]
                 except IndexError:
-                    logger.debug('No information found for {0}.'.
+                    logger.debug('No information found for {}.'.
                                  format(pkg.name))
                 finally:
                     req = Requirement(pkg.name,
@@ -142,30 +146,25 @@ def get_packages(req_files, extra_info=None):
     return reported_pkgs
 
 
-def is_py3k_compatible(package):
-    """Wrapper around caniusepython3 check function."""
-    compatible = caniusepython3.check(projects=[package])
-    if compatible:
-        return "{} compatible with Python 3.".format(package)
-    else:
-        return "{} not compatible with Python 3.".format(package)
-
-
 def generate_report(pkgs, py3k=False):
     """Generate packages report."""
     if not pkgs:
-        raise ValueError("Could not generate report without packages.")
+        raise ValueError('Could not generate report without packages.')
 
     for pkg in pkgs:
         if pkg.is_valid():
             if pkg.is_outdated():
-                logger.info("{} is outdated.".format(pkg.name))
+                logger.info('{} is outdated.'.format(pkg.name))
             else:
-                logger.info("{} is up-to-date.".format(pkg.name))
+                logger.info('{} is up-to-date.'.format(pkg.name))
             if py3k:
-                logger.info(is_py3k_compatible(pkg.name))
+                compatible = pkg.is_py3k_compatible()
+                if compatible:
+                    logger.info('{} is py3k compatible'.format(pkg.name))
+                else:
+                    logger.info('{} is not py3k compatible'.format(pkg.name))
         else:
-            logger.info("No information found for {}.".format(pkg.name))
+            logger.info('No information found for {}.'.format(pkg.name))
 
 
 @click.command()
