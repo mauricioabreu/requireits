@@ -84,7 +84,7 @@ def get_package_info(pkg_name):
     """Get package info. Setting FAIL_SILENTLY to true should stop running."""
     pkg_info = load_package_info(pkg_name)
     if not pkg_info and not FAIL_SILENTLY:
-        raise PackageNotFound('{} not found.'.format(pkg_name))
+        raise PackageNotFound('{0} not found.'.format(pkg_name))
     return pkg_info
 
 
@@ -133,7 +133,7 @@ def get_packages(req_files, extra_info=None):
                     installed_version = pkg.specs[0][1]
                     latest_version = pkg_versions[1]
                 except IndexError:
-                    logger.debug('No information found for {}.'.
+                    logger.debug('No information found for {0}.'.
                                  format(pkg.name))
                 finally:
                     req = Requirement(pkg.name,
@@ -154,17 +154,17 @@ def generate_report(pkgs, py3k=False):
     for pkg in pkgs:
         if pkg.is_valid():
             if pkg.is_outdated():
-                logger.info('{} is outdated.'.format(pkg.name))
+                logger.info('{0} is outdated.'.format(pkg.name))
             else:
-                logger.info('{} is up-to-date.'.format(pkg.name))
+                logger.info('{0} is up-to-date.'.format(pkg.name))
             if py3k:
                 compatible = pkg.is_py3k_compatible()
                 if compatible:
-                    logger.info('{} is py3k compatible'.format(pkg.name))
+                    logger.info('{0} is py3k compatible'.format(pkg.name))
                 else:
-                    logger.info('{} is not py3k compatible'.format(pkg.name))
+                    logger.info('{0} is not py3k compatible'.format(pkg.name))
         else:
-            logger.info('No information found for {}.'.format(pkg.name))
+            logger.info('No information found for {0}.'.format(pkg.name))
 
 
 @click.command()
