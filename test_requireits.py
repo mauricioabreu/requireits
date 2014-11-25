@@ -70,7 +70,7 @@ def test_multiple_requirement_files():
 
 def test_ignored_pkgs():
     """Test if ignored packages are being considered."""
-    with tempfile.NamedTemporaryFile('w+r') as f:
+    with tempfile.NamedTemporaryFile('w+') as f:
         f.write(TEST_REQUIREMENTS_PKGS)
         f.flush()
         extra_info = json.loads(REQUIREITS_JSON)

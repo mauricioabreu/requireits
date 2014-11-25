@@ -77,7 +77,7 @@ def load_package_info(pkg_name):
 
     if url_req.status_code == 200:
         pkg_info = url_req.text
-        return json.loads(pkg_info.decode('utf-8'))
+        return json.loads(pkg_info)
 
 
 def get_package_info(pkg_name):
@@ -116,7 +116,7 @@ def get_packages(req_files, extra_info=None):
         extra_info = get_extra_packages_info()
 
     # Lowercase all dict keys
-    extra_info = dict((k.lower(), v) for k, v in extra_info.iteritems())
+    extra_info = dict((k.lower(), v) for k, v in extra_info.items())
 
     for pkg in requirements_pkgs:
         installed_version = None
