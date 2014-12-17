@@ -27,7 +27,7 @@ There is a still in progress test suite.
 
 ::
 
-    py.test requireits_tests.py
+    py.test test_requireits.py
 
 Roadmap
 -------
