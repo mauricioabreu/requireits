@@ -3,5 +3,7 @@ __pycache__/
 .coverage
 htmlcov
 .tox
-*.egg
+eggs/
+.eggs/
 *.egg-info
+dist
