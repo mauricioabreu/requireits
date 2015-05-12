@@ -38,7 +38,7 @@ tests_require = [
 
 setup(
     name="requireits",
-    version="0.0.1-DEV",
+    version="0.0.1.dev0",
     packages=find_packages(),
     author="Mauricio de Abreu Antunes",
     author_email="mauricio.abreua@gmail.com",
